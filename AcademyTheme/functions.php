@@ -31,6 +31,8 @@ function pageBanner($args = NULL) {
 <?php }
 
 function academy_files() {
+	                                                      //Insert your API key in the line below after key=
+	wp_enqueue_script('googleMap', '//maps.googleapis.com/maps/api/js?key=', NULL, 1.0, true);
 	wp_enqueue_script('main-academy-js', get_theme_file_uri('/js/scripts-bundled.js'), NULL, microtime(), true);
 	wp_enqueue_style('academy_main_styles', get_stylesheet_uri(), NULL, microtime());
 	wp_enqueue_style('custom-google-fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
@@ -53,6 +55,10 @@ function academy_features() {
 add_action('after_setup_theme', 'academy_features');
 
 function academy_adjust_queries($query) {
+	if (!is_admin() AND is_post_type_archive( 'campus' ) AND $query->is_main_query()) {
+		$query->set('posts_per_page', -1);
+	}
+	
 	if (!is_admin() AND is_post_type_archive( 'program' ) AND $query->is_main_query()) {
 		$query->set('orderby', 'title');
 		$query->set('order', 'ASC');
@@ -76,3 +82,11 @@ function academy_adjust_queries($query) {
 }
 
 add_action( 'pre_get_posts', 'academy_adjust_queries');
+
+function academyMapKey($api) {
+	//insert your API key below in the $api line single quotes before the semicolon
+	$api['key'] = '';
+	return $api;
+}
+
+add_filter( 'acf/fields/google_map/api', 'academyMapKey' );
